@@ -4,7 +4,7 @@ type Cat struct {
 	Name        string
 	Description string
 	Breed       string
-	gender      Gender
+	Gender      Gender
 }
 
 type Gender int
