@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/des"
 	"errors"
 	"fmt"
 	"net/http"
@@ -18,7 +17,7 @@ func parseForm(r *http.Request, c *mysyqtar.Cat) error {
 	breed := r.FormValue("breed")
 	gender := r.FormValue("gender")
 
-	if name == "" || description == "" || breed == "" || gender == "" {
+	if name == "" {
 		return errors.New("Invalid form")
 	}
 
@@ -42,8 +41,6 @@ func main() {
 	})
 
 	http.HandleFunc("POST /mysyq", func(w http.ResponseWriter, r *http.Request) {
-		// name := r.FormValue("name")
-
 		var cat mysyqtar.Cat
 		// this or json?
 		err := parseForm(r, &cat)
@@ -57,9 +54,8 @@ func main() {
 			context.Background(),
 			`INSERT INTO cats (name, description, breed, gender)
 			VALUES ($1, $2, $3, $4)`,
-			cat.Name, cat.Description, cat.Breed, cat.Gender,
+			cat.Name, cat.Description, cat.Breed, cat.Gender.String(),
 		)
-		// tag, err := conn.Exec(context.Background(), "INSERT INTO cats (name) VALUES ($1)", name)
 		if err != nil && err != pgx.ErrNoRows {
 			fmt.Printf("%v\n", err)
 			w.Write([]byte("Could not add a new mysyq"))
