@@ -8,6 +8,17 @@ type Cat struct {
 	Gender      Gender `json:"gender"`
 }
 
+func (c *Cat) ParseGender(s string) {
+	switch s {
+	case "Male":
+		c.Gender = Male
+	case "Female":
+		c.Gender = Female
+	default:
+		c.Gender = Other
+	}
+}
+
 type Gender int
 
 const (
