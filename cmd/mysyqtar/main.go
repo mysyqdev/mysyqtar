@@ -2,12 +2,32 @@ package main
 
 import (
 	"context"
+	"crypto/des"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/mysyqdev/mysyqtar"
 )
+
+func parseForm(r *http.Request, c *mysyqtar.Cat) error {
+	name := r.FormValue("name")
+	description := r.FormValue("description")
+	breed := r.FormValue("breed")
+	gender := r.FormValue("gender")
+
+	if name == "" || description == "" || breed == "" || gender == "" {
+		return errors.New("Invalid form")
+	}
+
+	c.Name = name
+	c.Description = description
+	c.Breed = breed
+	c.ParseGender(gender)
+	return nil
+}
 
 func main() {
 	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
@@ -22,9 +42,24 @@ func main() {
 	})
 
 	http.HandleFunc("POST /mysyq", func(w http.ResponseWriter, r *http.Request) {
-		name := r.FormValue("name")
-		fmt.Println("Name to add:", name)
-		tag, err := conn.Exec(context.Background(), "INSERT INTO cats (name) VALUES ($1)", name)
+		// name := r.FormValue("name")
+
+		var cat mysyqtar.Cat
+		// this or json?
+		err := parseForm(r, &cat)
+		if err != nil {
+			fmt.Println("Could not parse the form")
+			// write an error to w
+			return
+		}
+
+		tag, err := conn.Exec(
+			context.Background(),
+			`INSERT INTO cats (name, description, breed, gender)
+			VALUES ($1, $2, $3, $4)`,
+			cat.Name, cat.Description, cat.Breed, cat.Gender,
+		)
+		// tag, err := conn.Exec(context.Background(), "INSERT INTO cats (name) VALUES ($1)", name)
 		if err != nil && err != pgx.ErrNoRows {
 			fmt.Printf("%v\n", err)
 			w.Write([]byte("Could not add a new mysyq"))
