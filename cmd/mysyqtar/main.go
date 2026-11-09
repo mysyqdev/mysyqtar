@@ -71,7 +71,7 @@ func main() {
 
 		rows, err := conn.Query(
 			context.Background(),
-			"SELECT id, name, description, breed, gender FROM  cats",
+			"SELECT * FROM  cats",
 		)
 		if err != nil {
 			fmt.Printf("%v\n", err)
