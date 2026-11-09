@@ -69,7 +69,10 @@ func main() {
 	http.HandleFunc("GET /mysyqtar", func(w http.ResponseWriter, r *http.Request) {
 		var cats []mysyqtar.Cat
 
-		rows, err := conn.Query(context.Background(), "SELECT id, name, description, breed, gender FROM  cats")
+		rows, err := conn.Query(
+			context.Background(),
+			"SELECT id, name, description, breed, gender FROM  cats",
+		)
 		if err != nil {
 			fmt.Printf("%v\n", err)
 			fmt.Println("QueryRow failed")
