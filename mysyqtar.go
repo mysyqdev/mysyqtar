@@ -16,7 +16,7 @@ const (
 	Other
 )
 
-func (c *Cat) ParseGender(s string) {
+func (c *Cat) SetGender(s string) {
 	switch s {
 	case "Male":
 		c.Gender = Male
