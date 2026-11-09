@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -24,7 +25,7 @@ func parseForm(r *http.Request, c *mysyqtar.Cat) error {
 	c.Name = name
 	c.Description = description
 	c.Breed = breed
-	c.ParseGender(gender)
+	c.SetGender(gender)
 	return nil
 }
 
@@ -66,21 +67,31 @@ func main() {
 	})
 
 	http.HandleFunc("GET /mysyqtar", func(w http.ResponseWriter, r *http.Request) {
-		var names []string
-		rows, err := conn.Query(context.Background(), "SELECT name FROM  cats")
-		for rows.Next() {
-			var name string
-			rows.Scan(&name)
-			names = append(names, name)
-		}
+		var cats []mysyqtar.Cat
+
+		rows, err := conn.Query(context.Background(), "SELECT id, name, description, breed, gender FROM  cats")
 		if err != nil {
 			fmt.Printf("%v\n", err)
 			fmt.Println("QueryRow failed")
 			return
 		}
-		for _, name := range names {
-			w.Write([]byte(name))
-			w.Write([]byte("\n"))
+
+		for rows.Next() {
+			var cat mysyqtar.Cat
+			var gender string
+			rows.Scan(&cat.ID, &cat.Name, &cat.Description, &cat.Breed, &gender)
+			cat.SetGender(gender)
+			cats = append(cats, cat)
+			if rows.Err() != nil {
+				fmt.Println(rows.Err().Error())
+			}
+		}
+
+		response, err := json.Marshal(cats)
+		if err == nil {
+			w.Write(response)
+		} else {
+			w.Write([]byte("Could not get mysyqs\n"))
 		}
 	})
 
