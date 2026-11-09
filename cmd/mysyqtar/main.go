@@ -101,19 +101,31 @@ func main() {
 	http.HandleFunc("GET /mysyqtar/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
 		if id == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid request\n"))
 			fmt.Println("No id")
 			return
 		}
 
-		var name string
-		err = conn.QueryRow(context.Background(), "SELECT name FROM cats WHERE id = $1", id).Scan(&name)
+		var cat mysyqtar.Cat
+		var gender string
+		err = conn.QueryRow(
+			context.Background(),
+			"SELECT * FROM cats WHERE id = $1", id,
+		).Scan(&cat.ID, &cat.Name, &cat.Description, &cat.Breed, &gender)
+		cat.SetGender(gender)
 		if err != nil {
 			fmt.Printf("%v\n", err)
 			w.Write([]byte("Mysyq not found"))
 			return
 		}
 
-		w.Write([]byte(name))
+		response, err := json.Marshal(cat)
+		if err == nil {
+			w.Write(response)
+		} else {
+			w.Write([]byte("Could not get mysyqs\n"))
+		}
 	})
 
 	// default serve mux not recommended?
