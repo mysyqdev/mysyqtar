@@ -41,7 +41,7 @@ func main() {
 		w.Write([]byte("meow not found :(\n"))
 	})
 
-	http.HandleFunc("POST /mysyq", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("POST /mysyq/", func(w http.ResponseWriter, r *http.Request) {
 		var cat mysyqtar.Cat
 		// this or json?
 		err := parseForm(r, &cat)
@@ -66,7 +66,7 @@ func main() {
 		w.Write([]byte("Added new mysyq"))
 	})
 
-	http.HandleFunc("GET /mysyqtar", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("GET /mysyqtar/", func(w http.ResponseWriter, r *http.Request) {
 		var cats []mysyqtar.Cat
 
 		rows, err := conn.Query(
@@ -98,7 +98,7 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("GET /mysyqtar/{id}", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("GET /mysyqtar/{id}/", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
 		if id == "" {
 			w.WriteHeader(http.StatusBadRequest)
