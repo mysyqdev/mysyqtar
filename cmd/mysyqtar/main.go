@@ -82,7 +82,7 @@ func main() {
 		for rows.Next() {
 			var cat mysyqtar.Cat
 			var gender string
-			rows.Scan(&cat.ID, &cat.Name, &cat.Description, &cat.Breed, &gender)
+			rows.Scan(&cat.ID, &cat.Name, &cat.Description, &gender, &cat.Breed)
 			cat.SetGender(gender)
 			cats = append(cats, cat)
 			if rows.Err() != nil {
@@ -112,7 +112,7 @@ func main() {
 		err = conn.QueryRow(
 			context.Background(),
 			"SELECT * FROM cats WHERE id = $1", id,
-		).Scan(&cat.ID, &cat.Name, &cat.Description, &cat.Breed, &gender)
+		).Scan(&cat.ID, &cat.Name, &cat.Description, &gender, &cat.Breed)
 		cat.SetGender(gender)
 		if err != nil {
 			fmt.Printf("%v\n", err)

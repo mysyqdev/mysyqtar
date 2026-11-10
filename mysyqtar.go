@@ -18,9 +18,9 @@ const (
 
 func (c *Cat) SetGender(s string) {
 	switch s {
-	case "Male":
+	case "male":
 		c.Gender = Male
-	case "Female":
+	case "female":
 		c.Gender = Female
 	default:
 		c.Gender = Other
