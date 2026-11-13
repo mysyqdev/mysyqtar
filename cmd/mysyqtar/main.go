@@ -96,8 +96,6 @@ func main() {
 		if err == nil {
 			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "GET")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 			json.NewEncoder(w).Encode(re)
 		} else {
 			w.Write([]byte("Could not get mysyqs\n"))
